@@ -1,3 +1,7 @@
+import random
+import secrets
+from typing import Tuple
+
 def LehmerLow(x0, count):
     m = 2**32
     a = 2**16 + 1
@@ -18,6 +22,8 @@ def bytes_to_number(bytes_list):
         result = (result << 8) + int(byte)
     return result
 
+def int_to_hex(dec_tuple: tuple) -> tuple:
+    return tuple(format(x, 'x') for x in dec_tuple)
 
 def jacobi_symbol(a, b):
     if b <= 0 or b % 2 == 0:
@@ -166,7 +172,7 @@ def generate_rsa_keys(bit_length=256, initial_value=12345):
     return (n, e), (d, p, q), initial_value
 
 
-def generate_rsa_keys_for_two(bit_length=256, initial_value=11111):
+def GenerateKeyPair(bit_length=256, initial_value=11111):
     public_A, private_A, initial_value = generate_rsa_keys(
         bit_length, initial_value)
     public_B, private_B, initial_value = generate_rsa_keys(
@@ -177,19 +183,43 @@ def generate_rsa_keys_for_two(bit_length=256, initial_value=11111):
         public_A, public_B = public_B, public_A
         private_A, private_B = private_B, private_A
     return [
-        public_A,
-        private_A,
-        public_B,
-        private_B
+        int_to_hex(public_A),
+        int_to_hex(private_A),
+        int_to_hex(public_B),
+        int_to_hex(private_B)
     ]
 
 
 p, initial_value = find_cute_prime(
     2**255, 2**256 - 1, k=20, initial_value=12343)
 print()
-keys = generate_rsa_keys_for_two(256, 12345)
+keys = GenerateKeyPair(256, 12345)
 print("Відкритий ключ A:", keys[0])
 print("Секретний ключ A:", keys[1])
 print()
 print("Відкритий ключ B:", keys[2])
 print("Секретний ключ B:", keys[3])
+
+
+if __name__ == "__main__":
+    p, initial_value = find_cute_prime(
+        2 ** 255, 2 ** 256 - 1, k=20, initial_value=12343)
+    keys = GenerateKeyPair(256, 12345)
+
+    with open('PublicKeysA.txt', 'wt') as f:
+        f.write(str(keys[0][1] + "," + keys[0][0]))
+
+    with open('SecretKeysA.txt', 'wt') as f:
+        f.write(str(keys[1][0] + "," + keys[1][1] + "," + keys[1][2]))
+
+    with open('PublicKeysB.txt', 'wt') as f:
+        f.write(str(keys[2][1] + "," + keys[2][0]))
+
+    with open('SecretKeysB.txt', 'wt') as f:
+        f.write(str(keys[3][0] + "," + keys[3][1] + "," + keys[3][2]))
+
+    print("Відкритий ключ A збережено у 'PublicKeysA.txt'.")
+    print("Секретний ключ A збережено у 'SecretKeysA.txt'.")
+    print("Відкритий ключ B збережено у 'PublicKeysB.txt'.")
+    print("Секретний ключ B збережено у 'SecretKeysB.txt'.")
+
